@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+	<style>
+	.axis {
+	  font: 10px sans-serif;
+	}
+	.axis path,
+	.axis line {
+	  fill: none;
+	  stroke: #000;
+	  shape-rendering: crispEdges;
+	}
+	.container {
+                 float: left;
+           }
+	</style>
+</head>
+
+<body>
+	<script src="http://d3js.org/d3.v3.min.js"></script>
+	<div style="width: 700; float:left; height:500; margin:10px" id="svg1" class="container">
+	<!--	<svg width="600" height="300" ></svg>-->
+	<script>
+
+	var margin = {top: 20, right: 20, bottom: 70, left: 40},
+	    width = 700 - margin.left - margin.right,
+	    height = 500 - margin.top - margin.bottom;
+
+	// Parse the date / time
+	var	parseDate = d3.time.format("%m").parse;
+
+	var x = d3.scale.ordinal().rangeRoundBands([0, width], .05);
+
+	var y = d3.scale.linear().range([height, 0]);
+
+	var xAxis = d3.svg.axis()
+	    .scale(x)
+	    .orient("bottom")
+	    .tickFormat(d3.time.format("%b"));
+
+	var yAxis = d3.svg.axis()
+	    .scale(y)
+	    .orient("left")
+	    .ticks(31);
+
+	var svg1 = d3.select("#svg1").append("svg")
+	    .attr("width", width + margin.left + margin.right)
+	    .attr("height", height + margin.top + margin.bottom)
+	  .append("g")
+	    .attr("transform",
+	          "translate(" + margin.left + "," + margin.top + ")");
+data = [
+
+        {Date:"1",present:"25"},{Date:"2",present:"26"}, {Date:"3",present:"27"}, {Date:"4",present:"28"},
+        {Date:"5",present:"28"},{Date:"6",present:"28"}, {Date:"7",present:"26"}, {Date:"8",present:"31"},
+        {Date:"9",present:"25"},{Date:"10",present:"21"},{Date:"11",present:"11"},{Date:"12",present:"31"}
+];
+
+
+	    data.forEach(function(d) {
+	        d.Date = parseDate(d.Date);
+	        d.Temperature = +d.present;
+	    });
+
+	  x.domain(data.map(function(d) { return d.Date; }));
+	  y.domain([0, 31]);
+
+	  svg1.append("g")
+	      .attr("class", "x axis")
+	      .attr("transform", "translate(0," + height + ")")
+	      .call(xAxis)
+	      .selectAll("text")
+              .style("font-size","12px")
+	      .attr("dx", ".8em")
+	      .attr("dy", ".70em");
+
+	  svg1.append("g")
+	      .attr("class", "y axis")
+	      .call(yAxis)
+	    .append("text")
+	      .attr("transform", "rotate(-90)")
+	      .attr("y", 6)
+	      .attr("dy", ".71em")
+	      .style("text-anchor", "end")
+	      .text("Present");
+
+	  var groupSpacing = 30;
+	  svg1.selectAll("bar")
+	      .data(data)
+	    .enter().append("rect")
+	      .style("fill", "steelblue")
+	      .attr("x", function(d) { return x(d.Date)+(groupSpacing / 2); })
+	      .attr("width", width/data.length - 30)
+	      .attr("y", function(d) { return y(d.present); })
+	      .attr("height", function(d) { return height - y(d.present); });
+		</script>
+	</div>
+</body>
